@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="rapidtechnologies.emailmanager.EmailManager" pluginWidget="true" needsEntityContext="true" offlineCapable="true"
+        supportedPlatform="Web"
+        xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
+    <name>Email Manager</name>
+    <description>Email Manager Widget</description>
+    <icon/>
+    <properties>
+        <propertyGroup caption="Data Source">
+            <property key="emailList" type="datasource" isList="true" required="false">
+                <caption>Email List Data</caption>
+                <description>List of emails to display</description>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Email Data Attributes">
+            <property key="subjectAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Subject</caption>
+                <description>Email subject</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="senderAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Sender</caption>
+                <description>Sender name or email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="dateAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Date</caption>
+                <description>Date received/sent</description>
+                <attributeTypes>
+                    <attributeType name="DateTime"/>
+                </attributeTypes>
+            </property>
+            <property key="snippetAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Body Snippet</caption>
+                <description>A short preview of the email body</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="bodyAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Body Content (Plain/HTML)</caption>
+                <description>The full content of the email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="isReadAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Is Read</caption>
+                <description>Boolean indicating if the email has been read</description>
+                <attributeTypes>
+                    <attributeType name="Boolean"/>
+                </attributeTypes>
+            </property>
+            <property key="groupCategoryAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Group Category</caption>
+                <description>String like 'Today', 'Yesterday', 'Last Week'</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="toAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>To</caption>
+                <description>Recipient(s) of the email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="ccAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Cc</caption>
+                <description>CC recipients of the email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="folderAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Folder</caption>
+                <description>Email folder: 'Inbox', 'Drafts', or 'Sent'</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Compose/Draft Data">
+            <property key="draftTo" type="attribute" required="false">
+                <caption>Draft To</caption>
+                <description>Attribute to store the To field (e.g. comma separated)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftCc" type="attribute" required="false">
+                <caption>Draft Cc</caption>
+                <description>Attribute to store the Cc field</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftSubject" type="attribute" required="false">
+                <caption>Draft Subject</caption>
+                <description>Attribute to store the subject input</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftBody" type="attribute" required="false">
+                <caption>Draft Body</caption>
+                <description>Attribute to store the email body (Rich Text/HTML)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Attachments">
+            <property key="attachmentList" type="datasource" isList="true" required="false">
+                <caption>Attachment List</caption>
+                <description>List of attachment file documents for the selected email</description>
+            </property>
+            <property key="attachmentNameAttribute" type="attribute" dataSource="attachmentList" required="false">
+                <caption>Attachment Name</caption>
+                <description>Filename of the attachment</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="attachmentSizeAttribute" type="attribute" dataSource="attachmentList" required="false">
+                <caption>Attachment Size</caption>
+                <description>File size in bytes</description>
+                <attributeTypes>
+                    <attributeType name="Integer"/>
+                    <attributeType name="Long"/>
+                    <attributeType name="Decimal"/>
+                </attributeTypes>
+            </property>
+            <property key="onDownloadAttachmentAction" type="action" dataSource="attachmentList" required="false">
+                <caption>On Download Attachment</caption>
+                <description>Action to download a single attachment</description>
+            </property>
+            <property key="onDownloadAllAttachmentsAction" type="action" required="false">
+                <caption>On Download All Attachments</caption>
+                <description>Action to download all attachments for the selected email</description>
+            </property>
+            <property key="onAttachFileAction" type="action" required="false">
+                <caption>On Attach File</caption>
+                <description>Action to trigger the Email Connector's Add Attachment flow in compose view</description>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Events">
+            <property key="onFetchEmailsAction" type="action" required="false">
+                <caption>On Fetch Emails</caption>
+                <description>Action triggered on widget load to fetch emails via IMAP (Mendix microflow)</description>
+            </property>
+            <property key="onCreateNewAction" type="action" required="false">
+                <caption>On Create New Email</caption>
+                <description>Action triggered when user clicks Create New Email (microflow should create EmailMessage object)</description>
+            </property>
+            <property key="onReplyAction" type="action" required="false">
+                <caption>On Reply</caption>
+                <description>Action to execute when user clicks reply</description>
+            </property>
+            <property key="onSendAction" type="action" required="false">
+                <caption>On Send</caption>
+                <description>Action to execute when user clicks send (microflow uses SMTP config)</description>
+            </property>
+            <property key="onSaveDraftAction" type="action" required="false">
+                <caption>On Save Draft</caption>
+                <description>Action to execute when user saves draft</description>
+            </property>
+            <property key="onEmailSelectAction" type="action" dataSource="emailList" required="false">
+                <caption>On Email Select</caption>
+                <description>Action to execute when an email from the inbox list is selected (Passes selected EmailMessage)</description>
+            </property>
+        </propertyGroup>
+    </properties>
+</widget>

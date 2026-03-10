@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="rapidtechnologies.emailmanager.EmailManager" pluginWidget="true" needsEntityContext="true" offlineCapable="true"
+        supportedPlatform="Web"
+        xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
+    <name>Email Manager</name>
+    <description>Email Manager Widget</description>
+    <icon/>
+    <properties>
+        <propertyGroup caption="Data Source">
+            <property key="emailList" type="datasource" isList="true" required="false">
+                <caption>Email List Data</caption>
+                <description>List of emails to display</description>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Email Data Attributes">
+            <property key="subjectAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Subject</caption>
+                <description>Email subject</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="senderAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Sender</caption>
+                <description>Sender name or email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="dateAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Date</caption>
+                <description>Date received/sent</description>
+                <attributeTypes>
+                    <attributeType name="DateTime"/>
+                </attributeTypes>
+            </property>
+            <property key="snippetAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Body Snippet</caption>
+                <description>A short preview of the email body</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="bodyAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Body Content (Plain/HTML)</caption>
+                <description>The full content of the email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="isReadAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Is Read</caption>
+                <description>Boolean indicating if the email has been read</description>
+                <attributeTypes>
+                    <attributeType name="Boolean"/>
+                </attributeTypes>
+            </property>
+            <property key="groupCategoryAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Group Category</caption>
+                <description>String like 'Today', 'Yesterday', 'Last Week'</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="toAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>To</caption>
+                <description>Recipient(s) of the email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="ccAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Cc</caption>
+                <description>CC recipients of the email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="folderAttribute" type="attribute" dataSource="emailList" required="false">
+                <caption>Folder</caption>
+                <description>Email folder: 'Inbox', 'Drafts', or 'Sent'</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Compose/Draft Data">
+            <property key="draftTo" type="attribute" required="false">
+                <caption>Draft To</caption>
+                <description>Attribute to store the To field (e.g. comma separated)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftCc" type="attribute" required="false">
+                <caption>Draft Cc</caption>
+                <description>Attribute to store the Cc field</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftSubject" type="attribute" required="false">
+                <caption>Draft Subject</caption>
+                <description>Attribute to store the subject input</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftBody" type="attribute" required="false">
+                <caption>Draft Body</caption>
+                <description>Attribute to store the email body (Rich Text/HTML)</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="To Popup - Partners">
+            <property key="partnerList" type="datasource" isList="true" required="false">
+                <caption>Partner List</caption>
+                <description>Partner objects from microflow</description>
+            </property>
+            <property key="partnerCaptionAttr" type="attribute" dataSource="partnerList" required="false">
+                <caption>Partner Caption</caption>
+                <description>Caption shown in partner dropdown</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="onPartnerChangeAction" type="action" dataSource="partnerList" required="false">
+                <caption>On Partner Change</caption>
+                <description>Microflow called when partner is checked/unchecked — toggles helper ↔ partner association</description>
+            </property>
+            <property key="selectedPartnerList" type="datasource" isList="true" required="false">
+                <caption>Selected Partner List</caption>
+                <description>Partners currently associated with the helper (used to show checkmarks in popup)</description>
+            </property>
+            <property key="selectedPartnerCaptionAttr" type="attribute" dataSource="selectedPartnerList" required="false">
+                <caption>Selected Partner Caption</caption>
+                <description>Caption for selected partners</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="To Popup - Partner Recipients">
+            <property key="partnerRecipientList" type="datasource" isList="true" required="false">
+                <caption>Partner Recipient List</caption>
+                <description>Recipients filtered by Mendix based on selected partners</description>
+            </property>
+            <property key="partnerRecipientCaptionAttr" type="attribute" dataSource="partnerRecipientList" required="false">
+                <caption>Partner Recipient Caption</caption>
+                <description>Email shown in partner recipient dropdown</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="To Popup - KHDA Recipients">
+            <property key="khdaRecipientList" type="datasource" isList="true" required="false">
+                <caption>KHDA Recipient List</caption>
+                <description>KHDA recipients from microflow</description>
+            </property>
+            <property key="khdaRecipientCaptionAttr" type="attribute" dataSource="khdaRecipientList" required="false">
+                <caption>KHDA Recipient Caption</caption>
+                <description>Email shown in KHDA recipient dropdown</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="onKhdaChangeAction" type="action" dataSource="khdaRecipientList" required="false">
+                <caption>On KHDA Change</caption>
+                <description>Microflow to toggle helper ↔ KHDA recipient association</description>
+            </property>
+            <property key="selectedKhdaList" type="datasource" isList="true" required="false">
+                <caption>Selected KHDA List</caption>
+                <description>KHDA recipients currently associated with the helper</description>
+            </property>
+            <property key="selectedKhdaCaptionAttr" type="attribute" dataSource="selectedKhdaList" required="false">
+                <caption>Selected KHDA Caption</caption>
+                <description>Caption for selected KHDA recipients</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="To Popup - Selected Recipients">
+            <property key="selectedRecipientList" type="datasource" isList="true" required="false">
+                <caption>Selected Recipient List</caption>
+                <description>Created recipient objects shown as tokens in To field</description>
+            </property>
+            <property key="selectedRecipientCaptionAttr" type="attribute" dataSource="selectedRecipientList" required="false">
+                <caption>Selected Recipient Caption</caption>
+                <description>Token label for selected recipient</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="onRemoveRecipientAction" type="action" dataSource="selectedRecipientList" required="false">
+                <caption>On Remove Recipient</caption>
+                <description>Microflow to delete a selected recipient object</description>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="To Popup - Actions">
+            <property key="onConfirmRecipientsAction" type="action" required="false">
+                <caption>On Confirm Recipients</caption>
+                <description>Microflow triggered on OK — reads draft attributes and creates recipient objects</description>
+            </property>
+            <property key="draftExternalEmails" type="attribute" required="false">
+                <caption>Draft External Emails</caption>
+                <description>Widget writes comma-separated external emails here before OK</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftSelectedRecipientIds" type="attribute" required="false">
+                <caption>Draft Selected Recipient IDs</caption>
+                <description>Widget writes comma-separated IDs of selected partner recipients + KHDA items here before OK</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Cc Popup - Partners">
+            <property key="ccPartnerList" type="datasource" isList="true" required="false">
+                <caption>CC Partner List</caption>
+                <description>Partner objects for CC popup</description>
+            </property>
+            <property key="ccPartnerCaptionAttr" type="attribute" dataSource="ccPartnerList" required="false">
+                <caption>CC Partner Caption</caption>
+                <description>Caption shown in CC partner dropdown</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="onCcPartnerChangeAction" type="action" dataSource="ccPartnerList" required="false">
+                <caption>On CC Partner Change</caption>
+                <description>Microflow called when CC partner is checked/unchecked — toggles helper ↔ CC partner association</description>
+            </property>
+            <property key="ccSelectedPartnerList" type="datasource" isList="true" required="false">
+                <caption>CC Selected Partner List</caption>
+                <description>Partners currently associated with the helper for CC</description>
+            </property>
+            <property key="ccSelectedPartnerCaptionAttr" type="attribute" dataSource="ccSelectedPartnerList" required="false">
+                <caption>CC Selected Partner Caption</caption>
+                <description>Caption for selected CC partners</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Cc Popup - Partner Recipients">
+            <property key="ccPartnerRecipientList" type="datasource" isList="true" required="false">
+                <caption>CC Partner Recipient List</caption>
+                <description>Recipients filtered by Mendix based on selected CC partners</description>
+            </property>
+            <property key="ccPartnerRecipientCaptionAttr" type="attribute" dataSource="ccPartnerRecipientList" required="false">
+                <caption>CC Partner Recipient Caption</caption>
+                <description>Email shown in CC partner recipient list</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="ccPartnerRecipientSubtitleAttr" type="attribute" dataSource="ccPartnerRecipientList" required="false">
+                <caption>CC Partner Recipient Subtitle</caption>
+                <description>Subtitle like 'Primary Contact' shown below email</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Cc Popup - Selected Recipients">
+            <property key="ccSelectedRecipientList" type="datasource" isList="true" required="false">
+                <caption>CC Selected Recipient List</caption>
+                <description>Confirmed CC recipient objects shown as tokens in Cc field</description>
+            </property>
+            <property key="ccSelectedRecipientCaptionAttr" type="attribute" dataSource="ccSelectedRecipientList" required="false">
+                <caption>CC Selected Recipient Caption</caption>
+                <description>Token label for selected CC recipient</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="onRemoveCcRecipientAction" type="action" dataSource="ccSelectedRecipientList" required="false">
+                <caption>On Remove CC Recipient</caption>
+                <description>Microflow to delete a selected CC recipient object</description>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Cc Popup - Actions">
+            <property key="onConfirmCcRecipientsAction" type="action" required="false">
+                <caption>On Confirm CC Recipients</caption>
+                <description>Microflow triggered on Save — reads draft attributes and creates CC recipient objects</description>
+            </property>
+            <property key="draftExternalCcEmails" type="attribute" required="false">
+                <caption>Draft External CC Emails</caption>
+                <description>Widget writes comma-separated external CC emails here before Save</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="draftSelectedCcRecipientIds" type="attribute" required="false">
+                <caption>Draft Selected CC Recipient IDs</caption>
+                <description>Widget writes comma-separated IDs of selected CC partner recipients here before Save</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="ccPartnershipEmailToggle" type="attribute" required="false">
+                <caption>Add Partnership Email to CC</caption>
+                <description>Boolean toggled by widget — when true, partnership email is auto-included in CC</description>
+                <attributeTypes>
+                    <attributeType name="Boolean"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Attachments">
+            <property key="attachmentList" type="datasource" isList="true" required="false">
+                <caption>Attachment List</caption>
+                <description>List of attachment file documents for the selected email</description>
+            </property>
+            <property key="attachmentNameAttribute" type="attribute" dataSource="attachmentList" required="false">
+                <caption>Attachment Name</caption>
+                <description>Filename of the attachment</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+            <property key="attachmentSizeAttribute" type="attribute" dataSource="attachmentList" required="false">
+                <caption>Attachment Size</caption>
+                <description>File size in bytes</description>
+                <attributeTypes>
+                    <attributeType name="Integer"/>
+                    <attributeType name="Long"/>
+                    <attributeType name="Decimal"/>
+                </attributeTypes>
+            </property>
+            <property key="onDownloadAttachmentAction" type="action" dataSource="attachmentList" required="false">
+                <caption>On Download Attachment</caption>
+                <description>Action to download a single attachment</description>
+            </property>
+            <property key="onDownloadAllAttachmentsAction" type="action" required="false">
+                <caption>On Download All Attachments</caption>
+                <description>Action to download all attachments for the selected email</description>
+            </property>
+            <property key="onAttachFileAction" type="action" required="false">
+                <caption>On Attach File</caption>
+                <description>Action to trigger the Email Connector's Add Attachment flow in compose view</description>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Events">
+            <property key="onFetchEmailsAction" type="action" required="false">
+                <caption>On Fetch Emails</caption>
+                <description>Action triggered on widget load to fetch emails via IMAP (Mendix microflow)</description>
+            </property>
+            <property key="onCreateNewAction" type="action" required="false">
+                <caption>On Create New Email</caption>
+                <description>Action triggered when user clicks Create New Email (microflow should create EmailMessage object)</description>
+            </property>
+            <property key="onReplyAction" type="action" required="false">
+                <caption>On Reply</caption>
+                <description>Action to execute when user clicks reply</description>
+            </property>
+            <property key="onSendAction" type="action" required="false">
+                <caption>On Send</caption>
+                <description>Action to execute when user clicks send (microflow uses SMTP config)</description>
+            </property>
+            <property key="onSaveDraftAction" type="action" required="false">
+                <caption>On Save Draft</caption>
+                <description>Action to execute when user saves draft</description>
+            </property>
+            <property key="onEmailSelectAction" type="action" dataSource="emailList" required="false">
+                <caption>On Email Select</caption>
+                <description>Action to execute when an email from the inbox list is selected (Passes selected EmailMessage)</description>
+            </property>
+        </propertyGroup>
+    </properties>
+</widget>

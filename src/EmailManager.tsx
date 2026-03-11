@@ -395,6 +395,41 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
     };
 
     const handleSend = () => {
+        // Populate draftTo from selected recipient tokens (To popup)
+        if (props.draftTo) {
+            const toEmails: string[] = [];
+            if (props.selectedRecipientList?.items && props.selectedRecipientCaptionAttr) {
+                props.selectedRecipientList.items.forEach(item => {
+                    const caption = props.selectedRecipientCaptionAttr!.get(item).value;
+                    if (caption) toEmails.push(caption);
+                });
+            }
+            const combinedTo = toEmails.join(",");
+            console.log("[EmailManager] Setting draftTo:", combinedTo);
+            props.draftTo.setValue(combinedTo);
+        }
+
+        // Populate draftCc from CC selected recipient tokens (CC popup)
+        if (props.draftCc) {
+            const ccEmails: string[] = [];
+            if (props.ccSelectedRecipientList?.items && props.ccSelectedRecipientCaptionAttr) {
+                props.ccSelectedRecipientList.items.forEach(item => {
+                    const caption = props.ccSelectedRecipientCaptionAttr!.get(item).value;
+                    if (caption) ccEmails.push(caption);
+                });
+            }
+            const combinedCc = ccEmails.join(",");
+            console.log("[EmailManager] Setting draftCc:", combinedCc);
+            props.draftCc.setValue(combinedCc);
+        }
+
+        console.log("[EmailManager] handleSend - final draft values:", {
+            to: props.draftTo?.value,
+            cc: props.draftCc?.value,
+            subject: props.draftSubject?.value,
+            body: props.draftBody?.value?.substring(0, 100)
+        });
+
         if (props.onSendAction && props.onSendAction.canExecute) {
             props.onSendAction.execute();
         }

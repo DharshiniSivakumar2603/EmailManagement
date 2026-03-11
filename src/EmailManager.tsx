@@ -136,6 +136,13 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
         return new Set<string>();
     }, [props.selectedKhdaList]);
 
+    const selectedPartnerRecipientIds: Set<string> = useMemo(() => {
+        if (props.selectedPartnerRecipientList?.items) {
+            return new Set(props.selectedPartnerRecipientList.items.map(item => item.id));
+        }
+        return new Set<string>();
+    }, [props.selectedPartnerRecipientList]);
+
     const selectedRecipients: PopupListItem[] = useMemo(() => {
         if (props.selectedRecipientList?.items) {
             return props.selectedRecipientList.items.map(item => ({
@@ -178,6 +185,13 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
         return new Set<string>();
     }, [props.ccSelectedPartnerList]);
 
+    const ccSelectedPartnerRecipientIds: Set<string> = useMemo(() => {
+        if (props.ccSelectedPartnerRecipientList?.items) {
+            return new Set(props.ccSelectedPartnerRecipientList.items.map(item => item.id));
+        }
+        return new Set<string>();
+    }, [props.ccSelectedPartnerRecipientList]);
+
     const ccSelectedRecipients: PopupListItem[] = useMemo(() => {
         if (props.ccSelectedRecipientList?.items) {
             return props.ccSelectedRecipientList.items.map(item => ({
@@ -191,9 +205,16 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
 
     // Handler: partner checkbox toggled in popup
     const handlePartnerChange = (item: PopupListItem) => {
+        console.log("[DEBUG] handlePartnerChange called for:", item.id, item.caption);
+        console.log("[DEBUG] onPartnerChangeAction exists:", !!props.onPartnerChangeAction);
         if (props.onPartnerChangeAction) {
             const action = props.onPartnerChangeAction.get(item.originalItem);
-            if (action?.canExecute) action.execute();
+            console.log("[DEBUG] action:", action);
+            console.log("[DEBUG] canExecute:", action?.canExecute);
+            if (action?.canExecute) {
+                console.log("[DEBUG] executing action...");
+                action.execute();
+            }
         }
     };
 
@@ -205,6 +226,22 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
         }
     };
 
+    // Handler: partner recipient checkbox toggled in popup
+    const handlePartnerRecipientChange = (item: PopupListItem) => {
+        console.log("[DEBUG] handlePartnerRecipientChange called for:", item.id, item.caption);
+        console.log("[DEBUG] onPartnerRecipientChangeAction exists:", !!props.onPartnerRecipientChangeAction);
+        if (props.onPartnerRecipientChangeAction) {
+            const action = props.onPartnerRecipientChangeAction.get(item.originalItem);
+            console.log("[DEBUG] action:", action, "canExecute:", action?.canExecute);
+            if (action?.canExecute) {
+                console.log("[DEBUG] executing partner recipient change action...");
+                action.execute();
+            }
+        } else {
+            console.warn("[DEBUG] onPartnerRecipientChangeAction is NOT configured in widget properties!");
+        }
+    };
+
     // Handler: KHDA checkbox toggled in popup
     const handleKhdaChange = (item: PopupListItem) => {
         if (props.onKhdaChangeAction) {
@@ -213,11 +250,8 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
         }
     };
 
-    // Handler: confirm recipients from popup
-    const handleConfirmRecipients = (selectedIds: string[], externalEmails: string[]) => {
-        if (props.draftSelectedRecipientIds) {
-            props.draftSelectedRecipientIds.setValue(selectedIds.join(","));
-        }
+    // Handler: confirm recipients from popup — only external emails now
+    const handleConfirmRecipients = (externalEmails: string[]) => {
         if (props.draftExternalEmails) {
             props.draftExternalEmails.setValue(externalEmails.join(","));
         }
@@ -234,6 +268,13 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
         }
     };
 
+    const handleCcPartnerRecipientChange = (item: PopupListItem) => {
+        if (props.onCcPartnerRecipientChangeAction) {
+            const action = props.onCcPartnerRecipientChangeAction.get(item.originalItem);
+            if (action?.canExecute) action.execute();
+        }
+    };
+
     const handleRemoveCcRecipient = (item: PopupListItem) => {
         if (props.onRemoveCcRecipientAction) {
             const action = props.onRemoveCcRecipientAction.get(item.originalItem);
@@ -241,10 +282,7 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
         }
     };
 
-    const handleConfirmCcRecipients = (selectedIds: string[], externalEmails: string[]) => {
-        if (props.draftSelectedCcRecipientIds) {
-            props.draftSelectedCcRecipientIds.setValue(selectedIds.join(","));
-        }
+    const handleConfirmCcRecipients = (externalEmails: string[]) => {
         if (props.draftExternalCcEmails) {
             props.draftExternalCcEmails.setValue(externalEmails.join(","));
         }
@@ -410,16 +448,20 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
                         khdaRecipients={khdaRecipients}
                         selectedRecipients={selectedRecipients}
                         selectedPartnerIds={selectedPartnerIds}
+                        selectedPartnerRecipientIds={selectedPartnerRecipientIds}
                         selectedKhdaIds={selectedKhdaIds}
                         onPartnerChange={handlePartnerChange}
+                        onPartnerRecipientChange={handlePartnerRecipientChange}
                         onKhdaChange={handleKhdaChange}
                         onRemoveRecipient={handleRemoveRecipient}
                         onConfirmRecipients={handleConfirmRecipients}
                         ccPartners={ccPartners}
                         ccPartnerRecipients={ccPartnerRecipients}
                         ccSelectedPartnerIds={ccSelectedPartnerIds}
+                        ccSelectedPartnerRecipientIds={ccSelectedPartnerRecipientIds}
                         ccSelectedRecipients={ccSelectedRecipients}
                         onCcPartnerChange={handleCcPartnerChange}
+                        onCcPartnerRecipientChange={handleCcPartnerRecipientChange}
                         onRemoveCcRecipient={handleRemoveCcRecipient}
                         onConfirmCcRecipients={handleConfirmCcRecipients}
                         ccPartnershipEmailEnabled={props.ccPartnershipEmailToggle?.value ?? false}
@@ -472,18 +514,25 @@ export function EmailManager(props: EmailManagerContainerProps): ReactElement {
                         partnerRecipients={partnerRecipients}
                         khdaRecipients={khdaRecipients}
                         selectedRecipients={selectedRecipients}
+                        selectedPartnerIds={selectedPartnerIds}
+                        selectedPartnerRecipientIds={selectedPartnerRecipientIds}
+                        selectedKhdaIds={selectedKhdaIds}
                         onPartnerChange={handlePartnerChange}
+                        onPartnerRecipientChange={handlePartnerRecipientChange}
+                        onKhdaChange={handleKhdaChange}
+                        onRemoveRecipient={handleRemoveRecipient}
+                        onConfirmRecipients={handleConfirmRecipients}
                         ccPartners={ccPartners}
                         ccPartnerRecipients={ccPartnerRecipients}
                         ccSelectedPartnerIds={ccSelectedPartnerIds}
+                        ccSelectedPartnerRecipientIds={ccSelectedPartnerRecipientIds}
                         ccSelectedRecipients={ccSelectedRecipients}
                         onCcPartnerChange={handleCcPartnerChange}
+                        onCcPartnerRecipientChange={handleCcPartnerRecipientChange}
                         onRemoveCcRecipient={handleRemoveCcRecipient}
                         onConfirmCcRecipients={handleConfirmCcRecipients}
                         ccPartnershipEmailEnabled={props.ccPartnershipEmailToggle?.value ?? false}
                         onCcPartnershipEmailToggle={handleCcPartnershipEmailToggle}
-                        onRemoveRecipient={handleRemoveRecipient}
-                        onConfirmRecipients={handleConfirmRecipients}
                     />
                 )}
             </div>

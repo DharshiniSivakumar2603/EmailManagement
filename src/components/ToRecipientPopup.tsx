@@ -1,4 +1,4 @@
-import { ReactElement, createElement, useState, useEffect, useMemo } from "react";
+import { ReactElement, createElement, useState, useEffect } from "react";
 import { PopupListItem } from "../EmailManager";
 
 // ─── Email Validation ────────────────────────────────────────────────────────
@@ -16,13 +16,15 @@ interface ToRecipientPopupProps {
     partners: PopupListItem[];
     partnerRecipients: PopupListItem[];   // filtered by Mendix based on selected partners
     khdaRecipients: PopupListItem[];
-    // Mendix-driven selection state (from helper associations)
+    // Mendix-driven selection state (ALL from helper associations)
     selectedPartnerIds: Set<string>;
+    selectedPartnerRecipientIds: Set<string>;  // now driven by Mendix, not local state
     selectedKhdaIds: Set<string>;
-    // Handlers
+    // Handlers — all toggle helper associations in Mendix
     onPartnerChange?: (item: PopupListItem) => void;
+    onPartnerRecipientChange?: (item: PopupListItem) => void;  // NEW: toggles helper ↔ PartnerRecipient
     onKhdaChange?: (item: PopupListItem) => void;
-    onConfirmRecipients: (selectedIds: string[], externalEmails: string[]) => void;
+    onConfirmRecipients: (externalEmails: string[]) => void;   // only external emails now
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -34,15 +36,15 @@ export function ToRecipientPopup({
     partnerRecipients,
     khdaRecipients,
     selectedPartnerIds,
+    selectedPartnerRecipientIds,
     selectedKhdaIds,
     onPartnerChange,
+    onPartnerRecipientChange,
     onKhdaChange,
     onConfirmRecipients
 }: ToRecipientPopupProps): ReactElement | null {
 
-    // Partner & KHDA selection state is driven by Mendix (via helper associations)
-    // Only partner recipients selection and external emails are local React state
-    const [selectedPartnerRecipientIds, setSelectedPartnerRecipientIds] = useState<Set<string>>(new Set());
+    // Only external emails remain as local React state
     const [externalEmails, setExternalEmails] = useState<string[]>([]);
     const [externalInput, setExternalInput] = useState("");
     const [externalError, setExternalError] = useState("");
@@ -55,7 +57,6 @@ export function ToRecipientPopup({
     // Reset local state when popup opens
     useEffect(() => {
         if (isOpen) {
-            setSelectedPartnerRecipientIds(new Set());
             setExternalEmails([]);
             setExternalInput("");
             setExternalError("");
@@ -65,53 +66,35 @@ export function ToRecipientPopup({
         }
     }, [isOpen]);
 
-    // When partner recipients list changes (Mendix re-filtered), clean up stale selections
-    const partnerRecipientIdSet = useMemo(() => new Set(partnerRecipients.map(pr => pr.id)), [partnerRecipients]);
-    useEffect(() => {
-        setSelectedPartnerRecipientIds(prev => {
-            const next = new Set<string>();
-            prev.forEach(id => { if (partnerRecipientIdSet.has(id)) next.add(id); });
-            return next.size !== prev.size ? next : prev;
-        });
-    }, [partnerRecipientIdSet]);
-
     if (!isOpen) return null;
 
     // ─── Handlers ────────────────────────────────────────────────────────────
 
     const togglePartner = (item: PopupListItem) => {
-        // Mendix handles the association toggle via onPartnerChange
+        console.log("[ToPopup] togglePartner clicked:", item.id, item.caption);
         onPartnerChange?.(item);
     };
 
-    const togglePartnerRecipient = (id: string) => {
-        setSelectedPartnerRecipientIds(prev => {
-            const next = new Set(prev);
-            if (next.has(id)) { next.delete(id); } else { next.add(id); }
-            return next;
-        });
+    const togglePartnerRecipient = (item: PopupListItem) => {
+        console.log("[ToPopup] togglePartnerRecipient clicked:", item.id, item.caption);
+        onPartnerRecipientChange?.(item);
     };
 
     const toggleKhda = (item: PopupListItem) => {
-        // Mendix handles the association toggle via onKhdaChange
+        console.log("[ToPopup] toggleKhda clicked:", item.id, item.caption);
         onKhdaChange?.(item);
     };
 
     const removePartnerChip = (item: PopupListItem) => {
-        // Deselect = same as toggle
         onPartnerChange?.(item);
     };
 
-    const removePartnerRecipientChip = (id: string) => {
-        setSelectedPartnerRecipientIds(prev => {
-            const next = new Set(prev);
-            next.delete(id);
-            return next;
-        });
+    const removePartnerRecipientChip = (item: PopupListItem) => {
+        // Deselect = same as toggle via Mendix
+        onPartnerRecipientChange?.(item);
     };
 
     const removeKhdaChip = (item: PopupListItem) => {
-        // Deselect = same as toggle
         onKhdaChange?.(item);
     };
 
@@ -143,12 +126,8 @@ export function ToRecipientPopup({
     };
 
     const handleConfirm = () => {
-        // Collect all selected Mendix object IDs (partner recipients + KHDA from helper)
-        const allSelectedIds = [
-            ...Array.from(selectedPartnerRecipientIds),
-            ...Array.from(selectedKhdaIds)
-        ];
-        onConfirmRecipients(allSelectedIds, externalEmails);
+        // Partner recipients and KHDA are already associated via helper — only pass external emails
+        onConfirmRecipients(externalEmails);
     };
 
     // ─── Render helpers ──────────────────────────────────────────────────────
@@ -201,14 +180,14 @@ export function ToRecipientPopup({
                     {partnersDropdownOpen && (
                         <div className="to-popup-dropdown">
                             {partners.map(p => (
-                                <label key={p.id} className="to-popup-dropdown-item">
+                                <div key={p.id} className="to-popup-dropdown-item" onClick={(e) => { e.stopPropagation(); togglePartner(p); }}>
                                     <input
                                         type="checkbox"
                                         checked={selectedPartnerIds.has(p.id)}
-                                        onChange={() => togglePartner(p)}
+                                        readOnly
                                     />
                                     <span>{p.caption}</span>
-                                </label>
+                                </div>
                             ))}
                         </div>
                     )}
@@ -234,7 +213,7 @@ export function ToRecipientPopup({
                                 selectedPRs.map(pr => ({
                                     key: pr.id,
                                     label: pr.caption,
-                                    onRemove: () => removePartnerRecipientChip(pr.id)
+                                    onRemove: () => removePartnerRecipientChip(pr)
                                 }))
                             )
                         )}
@@ -243,14 +222,14 @@ export function ToRecipientPopup({
                     {partnerRecipientsDropdownOpen && partnerRecipients.length > 0 && (
                         <div className="to-popup-dropdown">
                             {partnerRecipients.map(pr => (
-                                <label key={pr.id} className="to-popup-dropdown-item">
+                                <div key={pr.id} className="to-popup-dropdown-item" onClick={(e) => { e.stopPropagation(); togglePartnerRecipient(pr); }}>
                                     <input
                                         type="checkbox"
                                         checked={selectedPartnerRecipientIds.has(pr.id)}
-                                        onChange={() => togglePartnerRecipient(pr.id)}
+                                        readOnly
                                     />
                                     <span>{pr.caption}</span>
-                                </label>
+                                </div>
                             ))}
                         </div>
                     )}
@@ -272,14 +251,14 @@ export function ToRecipientPopup({
                     {khdaDropdownOpen && (
                         <div className="to-popup-dropdown">
                             {khdaRecipients.map(k => (
-                                <label key={k.id} className="to-popup-dropdown-item">
+                                <div key={k.id} className="to-popup-dropdown-item" onClick={(e) => { e.stopPropagation(); toggleKhda(k); }}>
                                     <input
                                         type="checkbox"
                                         checked={selectedKhdaIds.has(k.id)}
-                                        onChange={() => toggleKhda(k)}
+                                        readOnly
                                     />
                                     <span>{k.caption}</span>
-                                </label>
+                                </div>
                             ))}
                         </div>
                     )}

@@ -38,19 +38,23 @@ interface ComposeEditorProps {
     khdaRecipients?: PopupListItem[];
     selectedRecipients?: PopupListItem[];
     selectedPartnerIds?: Set<string>;
+    selectedPartnerRecipientIds?: Set<string>;
     selectedKhdaIds?: Set<string>;
     onPartnerChange?: (item: PopupListItem) => void;
+    onPartnerRecipientChange?: (item: PopupListItem) => void;
     onKhdaChange?: (item: PopupListItem) => void;
     onRemoveRecipient?: (item: PopupListItem) => void;
-    onConfirmRecipients?: (selectedIds: string[], externalEmails: string[]) => void;
+    onConfirmRecipients?: (externalEmails: string[]) => void;
     // Cc Popup data
     ccPartners?: PopupListItem[];
     ccPartnerRecipients?: CcPopupListItem[];
     ccSelectedPartnerIds?: Set<string>;
+    ccSelectedPartnerRecipientIds?: Set<string>;
     ccSelectedRecipients?: PopupListItem[];
     onCcPartnerChange?: (item: PopupListItem) => void;
+    onCcPartnerRecipientChange?: (item: PopupListItem) => void;
     onRemoveCcRecipient?: (item: PopupListItem) => void;
-    onConfirmCcRecipients?: (selectedIds: string[], externalEmails: string[]) => void;
+    onConfirmCcRecipients?: (externalEmails: string[]) => void;
     ccPartnershipEmailEnabled?: boolean;
     onCcPartnershipEmailToggle?: (enabled: boolean) => void;
 }
@@ -65,7 +69,7 @@ function getInitials(nameOrEmail: string): string {
     return name.substring(0, 2).toUpperCase();
 }
 
-export function ComposeEditor({ isReply, initialData, replyOriginalBody, replyOriginalSender, onFieldChange, onCancel, onSaveDraft, onSend, onAttachFile, attachments, onRemoveAttachment, partners, partnerRecipients, khdaRecipients, selectedRecipients, selectedPartnerIds, selectedKhdaIds, onPartnerChange, onKhdaChange, onRemoveRecipient, onConfirmRecipients, ccPartners, ccPartnerRecipients, ccSelectedPartnerIds, ccSelectedRecipients, onCcPartnerChange, onRemoveCcRecipient, onConfirmCcRecipients, ccPartnershipEmailEnabled, onCcPartnershipEmailToggle }: ComposeEditorProps): ReactElement {
+export function ComposeEditor({ isReply, initialData, replyOriginalBody, replyOriginalSender, onFieldChange, onCancel, onSaveDraft, onSend, onAttachFile, attachments, onRemoveAttachment, partners, partnerRecipients, khdaRecipients, selectedRecipients, selectedPartnerIds, selectedPartnerRecipientIds, selectedKhdaIds, onPartnerChange, onPartnerRecipientChange, onKhdaChange, onRemoveRecipient, onConfirmRecipients, ccPartners, ccPartnerRecipients, ccSelectedPartnerIds, ccSelectedPartnerRecipientIds, ccSelectedRecipients, onCcPartnerChange, onCcPartnerRecipientChange, onRemoveCcRecipient, onConfirmCcRecipients, ccPartnershipEmailEnabled, onCcPartnershipEmailToggle }: ComposeEditorProps): ReactElement {
 
     // Convert comma separated string to array for tokens
     const parseTokens = (str?: string) => str ? str.split(",").map(s => s.trim()).filter(Boolean) : [];
@@ -163,11 +167,13 @@ export function ComposeEditor({ isReply, initialData, replyOriginalBody, replyOr
                         partnerRecipients={partnerRecipients || []}
                         khdaRecipients={khdaRecipients || []}
                         selectedPartnerIds={selectedPartnerIds || new Set()}
+                        selectedPartnerRecipientIds={selectedPartnerRecipientIds || new Set()}
                         selectedKhdaIds={selectedKhdaIds || new Set()}
                         onPartnerChange={onPartnerChange}
+                        onPartnerRecipientChange={onPartnerRecipientChange}
                         onKhdaChange={onKhdaChange}
-                        onConfirmRecipients={(selectedIds: string[], externalEmails: string[]) => {
-                            onConfirmRecipients?.(selectedIds, externalEmails);
+                        onConfirmRecipients={(externalEmails: string[]) => {
+                            onConfirmRecipients?.(externalEmails);
                             setToPopupOpen(false);
                         }}
                     />
@@ -200,11 +206,13 @@ export function ComposeEditor({ isReply, initialData, replyOriginalBody, replyOr
                         partners={ccPartners || []}
                         partnerRecipients={ccPartnerRecipients || []}
                         selectedPartnerIds={ccSelectedPartnerIds || new Set()}
+                        selectedPartnerRecipientIds={ccSelectedPartnerRecipientIds || new Set()}
                         onPartnerChange={onCcPartnerChange}
+                        onPartnerRecipientChange={onCcPartnerRecipientChange}
                         partnershipEmailEnabled={ccPartnershipEmailEnabled}
                         onPartnershipEmailToggle={onCcPartnershipEmailToggle}
-                        onConfirmRecipients={(selectedIds: string[], externalEmails: string[]) => {
-                            onConfirmCcRecipients?.(selectedIds, externalEmails);
+                        onConfirmRecipients={(externalEmails: string[]) => {
+                            onConfirmCcRecipients?.(externalEmails);
                             setCcPopupOpen(false);
                         }}
                     />

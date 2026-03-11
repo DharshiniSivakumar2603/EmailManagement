@@ -155,6 +155,21 @@
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
+            <property key="onPartnerRecipientChangeAction" type="action" dataSource="partnerRecipientList" required="false">
+                <caption>On Partner Recipient Change</caption>
+                <description>Microflow called when a partner recipient is checked/unchecked — toggles helper ↔ PartnerRecipient association</description>
+            </property>
+            <property key="selectedPartnerRecipientList" type="datasource" isList="true" required="false">
+                <caption>Selected Partner Recipient List</caption>
+                <description>Partner recipients currently associated with the helper (checked items)</description>
+            </property>
+            <property key="selectedPartnerRecipientCaptionAttr" type="attribute" dataSource="selectedPartnerRecipientList" required="false">
+                <caption>Selected Partner Recipient Caption</caption>
+                <description>Caption for selected partner recipients</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
         </propertyGroup>
         <propertyGroup caption="To Popup - KHDA Recipients">
             <property key="khdaRecipientList" type="datasource" isList="true" required="false">
@@ -213,13 +228,6 @@
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
-            <property key="draftSelectedRecipientIds" type="attribute" required="false">
-                <caption>Draft Selected Recipient IDs</caption>
-                <description>Widget writes comma-separated IDs of selected partner recipients + KHDA items here before OK</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
         </propertyGroup>
         <propertyGroup caption="Cc Popup - Partners">
             <property key="ccPartnerList" type="datasource" isList="true" required="false">
@@ -268,6 +276,21 @@
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
+            <property key="onCcPartnerRecipientChangeAction" type="action" dataSource="ccPartnerRecipientList" required="false">
+                <caption>On CC Partner Recipient Change</caption>
+                <description>Microflow called when a CC partner recipient is checked/unchecked — toggles helper ↔ PartnerRecipient association for CC</description>
+            </property>
+            <property key="ccSelectedPartnerRecipientList" type="datasource" isList="true" required="false">
+                <caption>CC Selected Partner Recipient List</caption>
+                <description>CC partner recipients currently associated with the helper (checked items)</description>
+            </property>
+            <property key="ccSelectedPartnerRecipientCaptionAttr" type="attribute" dataSource="ccSelectedPartnerRecipientList" required="false">
+                <caption>CC Selected Partner Recipient Caption</caption>
+                <description>Caption for selected CC partner recipients</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
         </propertyGroup>
         <propertyGroup caption="Cc Popup - Selected Recipients">
             <property key="ccSelectedRecipientList" type="datasource" isList="true" required="false">
@@ -294,13 +317,6 @@
             <property key="draftExternalCcEmails" type="attribute" required="false">
                 <caption>Draft External CC Emails</caption>
                 <description>Widget writes comma-separated external CC emails here before Save</description>
-                <attributeTypes>
-                    <attributeType name="String"/>
-                </attributeTypes>
-            </property>
-            <property key="draftSelectedCcRecipientIds" type="attribute" required="false">
-                <caption>Draft Selected CC Recipient IDs</caption>
-                <description>Widget writes comma-separated IDs of selected CC partner recipients here before Save</description>
                 <attributeTypes>
                     <attributeType name="String"/>
                 </attributeTypes>

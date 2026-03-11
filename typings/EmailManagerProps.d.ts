@@ -34,6 +34,9 @@ export interface EmailManagerContainerProps {
     selectedPartnerCaptionAttr?: ListAttributeValue<string>;
     partnerRecipientList?: ListValue;
     partnerRecipientCaptionAttr?: ListAttributeValue<string>;
+    onPartnerRecipientChangeAction?: ListActionValue;
+    selectedPartnerRecipientList?: ListValue;
+    selectedPartnerRecipientCaptionAttr?: ListAttributeValue<string>;
     khdaRecipientList?: ListValue;
     khdaRecipientCaptionAttr?: ListAttributeValue<string>;
     onKhdaChangeAction?: ListActionValue;
@@ -44,7 +47,6 @@ export interface EmailManagerContainerProps {
     onRemoveRecipientAction?: ListActionValue;
     onConfirmRecipientsAction?: ActionValue;
     draftExternalEmails?: EditableValue<string>;
-    draftSelectedRecipientIds?: EditableValue<string>;
     ccPartnerList?: ListValue;
     ccPartnerCaptionAttr?: ListAttributeValue<string>;
     onCcPartnerChangeAction?: ListActionValue;
@@ -53,12 +55,14 @@ export interface EmailManagerContainerProps {
     ccPartnerRecipientList?: ListValue;
     ccPartnerRecipientCaptionAttr?: ListAttributeValue<string>;
     ccPartnerRecipientSubtitleAttr?: ListAttributeValue<string>;
+    onCcPartnerRecipientChangeAction?: ListActionValue;
+    ccSelectedPartnerRecipientList?: ListValue;
+    ccSelectedPartnerRecipientCaptionAttr?: ListAttributeValue<string>;
     ccSelectedRecipientList?: ListValue;
     ccSelectedRecipientCaptionAttr?: ListAttributeValue<string>;
     onRemoveCcRecipientAction?: ListActionValue;
     onConfirmCcRecipientsAction?: ActionValue;
     draftExternalCcEmails?: EditableValue<string>;
-    draftSelectedCcRecipientIds?: EditableValue<string>;
     ccPartnershipEmailToggle?: EditableValue<boolean>;
     attachmentList?: ListValue;
     attachmentNameAttribute?: ListAttributeValue<string>;
@@ -107,6 +111,9 @@ export interface EmailManagerPreviewProps {
     selectedPartnerCaptionAttr: string;
     partnerRecipientList: {} | { caption: string } | { type: string } | null;
     partnerRecipientCaptionAttr: string;
+    onPartnerRecipientChangeAction: {} | null;
+    selectedPartnerRecipientList: {} | { caption: string } | { type: string } | null;
+    selectedPartnerRecipientCaptionAttr: string;
     khdaRecipientList: {} | { caption: string } | { type: string } | null;
     khdaRecipientCaptionAttr: string;
     onKhdaChangeAction: {} | null;
@@ -117,7 +124,6 @@ export interface EmailManagerPreviewProps {
     onRemoveRecipientAction: {} | null;
     onConfirmRecipientsAction: {} | null;
     draftExternalEmails: string;
-    draftSelectedRecipientIds: string;
     ccPartnerList: {} | { caption: string } | { type: string } | null;
     ccPartnerCaptionAttr: string;
     onCcPartnerChangeAction: {} | null;
@@ -126,12 +132,14 @@ export interface EmailManagerPreviewProps {
     ccPartnerRecipientList: {} | { caption: string } | { type: string } | null;
     ccPartnerRecipientCaptionAttr: string;
     ccPartnerRecipientSubtitleAttr: string;
+    onCcPartnerRecipientChangeAction: {} | null;
+    ccSelectedPartnerRecipientList: {} | { caption: string } | { type: string } | null;
+    ccSelectedPartnerRecipientCaptionAttr: string;
     ccSelectedRecipientList: {} | { caption: string } | { type: string } | null;
     ccSelectedRecipientCaptionAttr: string;
     onRemoveCcRecipientAction: {} | null;
     onConfirmCcRecipientsAction: {} | null;
     draftExternalCcEmails: string;
-    draftSelectedCcRecipientIds: string;
     ccPartnershipEmailToggle: string;
     attachmentList: {} | { caption: string } | { type: string } | null;
     attachmentNameAttribute: string;

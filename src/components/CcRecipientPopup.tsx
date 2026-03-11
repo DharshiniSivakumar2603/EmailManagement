@@ -19,11 +19,13 @@ interface CcRecipientPopupProps {
     // Mendix-driven data
     partners: PopupListItem[];
     partnerRecipients: CcPopupListItem[];   // filtered by Mendix based on selected partners
-    // Mendix-driven selection state (from helper associations)
+    // Mendix-driven selection state (ALL from helper associations)
     selectedPartnerIds: Set<string>;
-    // Handlers
+    selectedPartnerRecipientIds: Set<string>;  // now driven by Mendix
+    // Handlers — all toggle helper associations in Mendix
     onPartnerChange?: (item: PopupListItem) => void;
-    onConfirmRecipients: (selectedIds: string[], externalEmails: string[]) => void;
+    onPartnerRecipientChange?: (item: PopupListItem) => void;   // toggles helper ↔ PartnerRecipient
+    onConfirmRecipients: (externalEmails: string[]) => void;    // only external emails
     // Partnership email toggle
     partnershipEmailEnabled?: boolean;
     onPartnershipEmailToggle?: (enabled: boolean) => void;
@@ -37,14 +39,15 @@ export function CcRecipientPopup({
     partners,
     partnerRecipients,
     selectedPartnerIds,
+    selectedPartnerRecipientIds,
     onPartnerChange,
+    onPartnerRecipientChange,
     onConfirmRecipients,
     partnershipEmailEnabled,
     onPartnershipEmailToggle
 }: CcRecipientPopupProps): ReactElement | null {
 
-    // Local state for partner recipient selections and external emails
-    const [selectedPartnerRecipientIds, setSelectedPartnerRecipientIds] = useState<Set<string>>(new Set());
+    // Only external emails remain as local React state
     const [externalEmails, setExternalEmails] = useState<string[]>([]);
     const [externalInput, setExternalInput] = useState("");
     const [externalError, setExternalError] = useState("");
@@ -59,7 +62,6 @@ export function CcRecipientPopup({
     // Reset local state when popup opens
     useEffect(() => {
         if (isOpen) {
-            setSelectedPartnerRecipientIds(new Set());
             setExternalEmails([]);
             setExternalInput("");
             setExternalError("");
@@ -68,16 +70,6 @@ export function CcRecipientPopup({
             setRecipientSearch("");
         }
     }, [isOpen]);
-
-    // When partner recipients list changes (Mendix re-filtered), clean up stale selections
-    const partnerRecipientIdSet = useMemo(() => new Set(partnerRecipients.map(pr => pr.id)), [partnerRecipients]);
-    useEffect(() => {
-        setSelectedPartnerRecipientIds(prev => {
-            const next = new Set<string>();
-            prev.forEach(id => { if (partnerRecipientIdSet.has(id)) next.add(id); });
-            return next.size !== prev.size ? next : prev;
-        });
-    }, [partnerRecipientIdSet]);
 
     // Filter partner recipients by search term
     const filteredRecipients = useMemo(() => {
@@ -94,27 +86,21 @@ export function CcRecipientPopup({
     // ─── Handlers ────────────────────────────────────────────────────────────
 
     const togglePartner = (item: PopupListItem) => {
+        console.log("[CcPopup] togglePartner clicked:", item.id, item.caption);
         onPartnerChange?.(item);
     };
 
-    const togglePartnerRecipient = (id: string) => {
-        setSelectedPartnerRecipientIds(prev => {
-            const next = new Set(prev);
-            if (next.has(id)) { next.delete(id); } else { next.add(id); }
-            return next;
-        });
+    const togglePartnerRecipient = (item: PopupListItem) => {
+        console.log("[CcPopup] togglePartnerRecipient clicked:", item.id, item.caption);
+        onPartnerRecipientChange?.(item);
     };
 
     const removePartnerChip = (item: PopupListItem) => {
         onPartnerChange?.(item);
     };
 
-    const removePartnerRecipientChip = (id: string) => {
-        setSelectedPartnerRecipientIds(prev => {
-            const next = new Set(prev);
-            next.delete(id);
-            return next;
-        });
+    const removePartnerRecipientChip = (item: PopupListItem) => {
+        onPartnerRecipientChange?.(item);
     };
 
     const removeExternalChip = (email: string) => {
@@ -145,8 +131,8 @@ export function CcRecipientPopup({
     };
 
     const handleConfirm = () => {
-        const allSelectedIds = Array.from(selectedPartnerRecipientIds);
-        onConfirmRecipients(allSelectedIds, externalEmails);
+        // Partner recipients are already associated via helper — only pass external emails
+        onConfirmRecipients(externalEmails);
     };
 
     // ─── Render helpers ──────────────────────────────────────────────────────
@@ -198,14 +184,14 @@ export function CcRecipientPopup({
                     {partnersDropdownOpen && (
                         <div className="to-popup-dropdown">
                             {partners.map(p => (
-                                <label key={p.id} className="to-popup-dropdown-item">
+                                <div key={p.id} className="to-popup-dropdown-item" onClick={(e) => { e.stopPropagation(); togglePartner(p); }}>
                                     <input
                                         type="checkbox"
                                         checked={selectedPartnerIds.has(p.id)}
-                                        onChange={() => togglePartner(p)}
+                                        readOnly
                                     />
                                     <span>{p.caption}</span>
-                                </label>
+                                </div>
                             ))}
                         </div>
                     )}
@@ -231,7 +217,7 @@ export function CcRecipientPopup({
                                 selectedPRs.map(pr => ({
                                     key: pr.id,
                                     label: pr.caption,
-                                    onRemove: () => removePartnerRecipientChip(pr.id)
+                                    onRemove: () => removePartnerRecipientChip(pr)
                                 }))
                             )
                         )}
@@ -260,7 +246,7 @@ export function CcRecipientPopup({
                         </div>
                         <div className="cc-popup-recipient-list">
                             {filteredRecipients.map(pr => (
-                                <label key={pr.id} className="cc-popup-recipient-item">
+                                <div key={pr.id} className="cc-popup-recipient-item" onClick={(e) => { e.stopPropagation(); togglePartnerRecipient(pr); }}>
                                     <div className="cc-popup-recipient-info">
                                         <span className="cc-popup-recipient-email">{pr.caption}</span>
                                         {pr.subtitle && (
@@ -270,9 +256,9 @@ export function CcRecipientPopup({
                                     <input
                                         type="checkbox"
                                         checked={selectedPartnerRecipientIds.has(pr.id)}
-                                        onChange={() => togglePartnerRecipient(pr.id)}
+                                        readOnly
                                     />
-                                </label>
+                                </div>
                             ))}
                             {filteredRecipients.length === 0 && (
                                 <div className="cc-popup-no-results">No recipients found</div>
